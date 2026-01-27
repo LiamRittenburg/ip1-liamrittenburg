@@ -5,7 +5,7 @@ public class App
 {
     public static void main( String[] args )
     {
-        
+        System.out.println(playGame());
     }
 
     /**
@@ -21,24 +21,34 @@ public class App
     * 
     * There are 14 method cards, 8 module cards, 8 framework cards, 60 bitcoin cards, 40 ethereum cards, and 30 dogecoin cards. After cards are played, they remain in thr player's deck.
     */
-    public static void playGame() {
+    public static String playGame() {
         Player player1 = new Player();
         Player player2 = new Player();
         // Initialize supply deck
         Supply supply = new Supply();
 
         // Deal starting hands
-        player1.setupStartingDeck(supply);
-        player2.setupStartingDeck(supply);
+        player1.addStartingDeck(supply.setupStartingDeck());
+        player2.addStartingDeck(supply.setupStartingDeck());
 
+        Player otherPlayer;
         // Game loop
-        Player currentPlayer = player1;
-        Player otherPlayer = player2;
+        Player currentPlayer = selectStartingPlayer(player1, player2);
+        if (currentPlayer == player1) {
+            otherPlayer = player2;
+        }
+        else {
+            otherPlayer = player2;
+        }
 
         while (supply.getFrameworkCount() > 0) {
             // Buy phase
             int value = currentPlayer.calculatePlayValue();
-            currentPlayer.buyCard(supply, value);
+            Card boughtCard = supply.buyCard(value);
+            if (boughtCard != null) {
+                currentPlayer.deck.addCardToDiscardPile(boughtCard);
+                currentPlayer.deck.addCardToAllCards(boughtCard);
+            }
             
             // Cleanup phase
             currentPlayer.cleanup();
@@ -54,11 +64,24 @@ public class App
         int player2Score = player2.getAutomationValue();
 
         if (player1Score > player2Score) {
-            return "Player 1";
+            return "Player 1 wins";
         } else if (player2Score > player1Score) {
-            return "Player 2";
+            return "Player 2 wins";
         } else {
             return "Tie";
+        }
+    }
+
+    public static Player selectStartingPlayer(Player player1, Player player2)
+    {
+        double rand = Math.random();
+        if (rand < 0.5)
+        {
+            return player1; // Player 1
+        }
+        else
+        {
+            return player2; // Player 2
         }
     }
 

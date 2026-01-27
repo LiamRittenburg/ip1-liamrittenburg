@@ -1,5 +1,7 @@
 package edu.brandeis.cosi103a.ip1;
 
+import java.util.ArrayList;
+
 public class Player {
     Deck deck;
 
@@ -32,7 +34,14 @@ public class Player {
         return totalValue;
     }
 
-    public void buyCard(Card card) {
-        deck.addToDiscard(card);
+    public void addStartingDeck(ArrayList<Card> startingCards) {
+        for (Card card : startingCards) {
+            deck.addCardToDrawPile(card);
+            deck.addCardToAllCards(card);
+        }
+        deck.shuffle(deck.drawPile);
+        deck.refillHand();
     }
+
+    
 }
